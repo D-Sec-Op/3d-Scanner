@@ -17,13 +17,13 @@ import os
 GPIO.setmode(GPIO.BCM)
 GPIO.setwarnings(False)
 
-motor1 = [4, 17, 27, 22]					# GPIO pins of Z axis motor
-motor2 = [5, 6, 13, 19]						# GPIO pins of object platform motor
+motor1 = [4, 17, 27, 22]			# GPIO pins of Z axis motor
+motor2 = [5, 6, 13, 19]				# GPIO pins of object platform motor
 motorpins = [4, 17, 27, 22, 5, 6, 13, 19]	# This extra list of all motor pins lets me remove 2 for loops and 6 lines of code initializing/closing pins
-filename = 'scanfile.txt'						# Name of file to write scan data to
-ZMAX = 105 									# Maximum verical increments for scanning, each approx 1mm vert height 
+filename = 'scanfile.txt'			# Name of file to write scan data to
+ZMAX = 105 					# Maximum verical increments for scanning, each approx 1mm vert height 
 
-for pin in motorpins:						# Set all necessary GPIO pins to output mode
+for pin in motorpins:				# Set all necessary GPIO pins to output mode
 	GPIO.setup(pin,GPIO.OUT)
 	GPIO.output(pin, False)
 
@@ -63,10 +63,10 @@ def scan():
 	temp = 0
 	try:
 		with smbus.SMBus(1) as bus:
-			for dist in range(50):			# Take 50 scans, scanner is finnicky, averaging the 50 scans gives more consistent results
+			for dist in range(50):				# Take 50 scans, scanner is finnicky, averaging the 50 scans gives more consistent results
 				sleep(0.01)  				# Sleep here helps prevent errors
-				bus.write_byte(0x4b, 0x8f)  # send command byte to ADC for correct address and channel per documentation
-				temp = float(bus.read_byte(0x4b)/100) # read the converted value back, cast to float and convert to represent voltage
+				bus.write_byte(0x4b, 0x8f)  		# send command byte to ADC for correct address and channel per documentation
+				temp = float(bus.read_byte(0x4b)/100)	# read the converted value back, cast to float and convert to represent voltage
 				temp = -5.40274*pow(temp, 3)+28.4823 * pow(temp, 2)-49.7115*temp+31.3444   # Quadrature equation to convert voltage to distance
 				data += temp				# Add each scan to data to be averaged before return
 			return(round((data/50), 2))
@@ -78,22 +78,22 @@ def main():
 	z_current = 0
 	last_valid = 0
 	dist = 0
-	with open(filename, 'w') as scanfile: 	# Open file to write scan data to
-		while z_current < ZMAX:				# Loop until scanner reaches desired vertical maximum
-			for step in range(256):			# 256 * 16 steps is a full rotation
+	with open(filename, 'w') as scanfile: 				# Open file to write scan data to
+		while z_current < ZMAX:					# Loop until scanner reaches desired vertical maximum
+			for step in range(256):				# 256 * 16 steps is a full rotation
 				dist = scan()				# Scan current point of object
-				if dist is not 0:						# Make sure scan returned valid data
-					last_valid = dist					# If newest data is valid, assign it to last_valid
+				if dist is not 0:			# Make sure scan returned valid data
+					last_valid = dist		# If newest data is valid, assign it to last_valid
 				scanfile.write(str(last_valid)+"\n")	# Write most recent valid data to scanfile
-				print(step, last_valid)					# Debugging
-				rotate(motor2, 1, 16, 1)				# Turn object platform by 16 steps (~1.41 degrees) clockwise, full speed
+				print(step, last_valid)			# Debugging
+				rotate(motor2, 1, 16, 1)		# Turn object platform by 16 steps (~1.41 degrees) clockwise, full speed
 
-				if step == 255:					# If one full rotation of platform has occured
+				if step == 255:				# If one full rotation of platform has occured
 					scanfile.write("9999.00\n")	# Write layer delimiter to file
-					z_current+= 1				# Increment vertical position counter
-					step = 0					# Reset rotational counter
-					rotate(motor1, 1, 600, 1)	# increase z-axis, 600 steps = approx 1 mm
-					sleep(1)
+					z_current+= 1			# Increment vertical position counter
+					step = 0			# Reset rotational counter
+					rotate(motor1, 1, 600, 1)	# Increase z-axis, 600 steps = approx 1 mm
+					sleep(1)			# Give everything a second to finish moving
 
 	for pin in motorpins:
 		GPIO.output(pin, False)

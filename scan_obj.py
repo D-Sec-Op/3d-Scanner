@@ -40,7 +40,7 @@ def rotate(motor, speed, iDeg, iDirection, pos = None):
 	if pos is not None:			# The iSeqPos argument is used for granular control of where a motor begins at each operation
 		iSeqPos = int(pos)		# It is left here for potential use in future builds
 
-	for step in range(0,iDeg):					# Activates motor coils according to bitmapping in aSequence and required number of steps
+	for step in range(0,iDeg):		# Activates motor coils according to bitmapping in aSequence and required number of steps
 		for iPin in range(0, 4):
 			iRealPin = motor[iPin]
 			if aSequence[iSeqPos][iPin] != 0:
@@ -48,7 +48,7 @@ def rotate(motor, speed, iDeg, iDirection, pos = None):
 			else:
 				GPIO.output(iRealPin, False)
 		
-		iSeqPos += iDirection					# Again iSeqPos not really needed here but could be useful to import this fun to other projects
+		iSeqPos += iDirection		# Again iSeqPos not really needed here but could be useful to import this fun to other projects
 		if (iSeqPos >= iNumSteps):
 			iSeqPos = 0
 		if (iSeqPos < 0):

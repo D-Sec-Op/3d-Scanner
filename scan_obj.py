@@ -4,6 +4,7 @@ Description: This program works as a driver software for a simple 3d scanner bas
 			https://github.com/SuperMakeSomething/diy-3d-scanner/blob/master/scannerCode.ino
 			It has been designed to function on a Raspberry Pi rather than arduino, and writes the scan data to a local file rather than SD card.
 			The build this code was designed around uses two 28BYJ-48 motors and ULN2003APG driver boards. The scanner is a Sharp GP2Y0A51SK0F.
+			It is necessary to use an ADC with the scanner to convert analog return to a digital voltage measurement.
 			The rotate function here is a derivative of https://github.com/Basch3000/raspberry-pi-projects/blob/master/motordeg.py
 Author: Daniel Schenk
 Date: 7 December 2021
